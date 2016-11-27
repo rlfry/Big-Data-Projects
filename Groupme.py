@@ -17,10 +17,10 @@ def _get_group_ID(group_name, access_token):
 
 def main():
     required_info = {}
-    required_info['Access Token'] = '8GzVc1uYiakhuRQELHHzgKUY7SjK4E8c8FdAPDXE'
+    #required_info['Access Token'] = 'INSERT ACCESS TOKEN HERE'
     required_info['Group Name'] = 'BIG Data'
     #required_info['Group Members'] = 'Robby Fry:Robby_Fry'
-    group_ID = 26254692
+    #group_ID = INSERT GROUP ID HERE
     #group_ID = _get_group_ID(required_info['Group Name'], required_info['Access Token'])
     request = requests.get('{}/groups/{}/messages?limit=100&token={}'.format('https://api.groupme.com/v3',group_ID, required_info['Access Token']))
     response = request.json()['response']
