@@ -38,10 +38,9 @@ def _filter_messages(msgs):
 
 def main():
     required_info = {}
-    required_info['Access Token'] = 'GI06VY9NNHhWwfwILfIJFCCXaPpLE5XizxSUcmdH'
+    required_info['Access Token'] = #Insert access token here
     required_info['Group Name'] = 'MVPs'
-    #group_ID = 26254692 #BIGData
-    group_ID = 7081565 #MVPs
+    group_ID = #Insert group ID here
     _get_messages(required_info, group_ID)
     #with open('bigData.json', 'w') as outfile:
         #json.dump(messages, outfile)
