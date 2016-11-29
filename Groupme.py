@@ -7,24 +7,43 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 requests.packages.urllib3.disable_warnings(InsecurePlatformWarning)
 requests.packages.urllib3.disable_warnings(SNIMissingWarning)
 
-def _get_group_ID(group_name, access_token):
-    request = requests.get('{}/groups?token={}.'.format('https://api.groupme.com/v3',access_token))
+def _get_messages(r_info, ID):
+    request = requests.get('{}/groups/{}/messages?limit=100&token={}'.format('https://api.groupme.com/v3',ID, r_info['Access Token']))
     response = request.json()['response']
-    for group in response:
-        name = ''.join([i if ord(i) < 128 else ' ' for i in group['name']])
-        if group_name == name.strip():
-            return group['id']
+    retrieved = len(response['messages'])
+    messages = _filter_messages(response['messages'])
+    message_count = response['count']
+    #print('Message Count: {}'.format(message_count))
+    while retrieved < message_count:
+        before_ID = messages[-1]['id']
+        request = requests.get('{}/groups/{}/messages?limit=100&before_id={}&token={}'.format('https://api.groupme.com/v3',ID, before_ID, r_info['Access Token']))
+             
+        # Break if status code 304 (i.e. no data) is returned
+        if (request.status_code == 304): break
+        response = request.json()['response']
+        retrieved += len(response['messages'])
+        print('Retrieved: {}'.format(retrieved))
+        messages += _filter_messages(response['messages'])
+        #print('Messages length: {}'.format(len(messages)))
+
+
+def _filter_messages(msgs):
+	messages = []
+	for message in msgs:
+		if message['user_id'] != 'system':
+			messages.append(message)
+			with open('MVP.json', 'a+') as outfile:
+				json.dump(message, outfile)
+	return messages
 
 def main():
     required_info = {}
-    #required_info['Access Token'] = 'INSERT ACCESS TOKEN HERE'
-    required_info['Group Name'] = 'BIG Data'
-    #required_info['Group Members'] = 'Robby Fry:Robby_Fry'
-    #group_ID = INSERT GROUP ID HERE
-    #group_ID = _get_group_ID(required_info['Group Name'], required_info['Access Token'])
-    request = requests.get('{}/groups/{}/messages?limit=100&token={}'.format('https://api.groupme.com/v3',group_ID, required_info['Access Token']))
-    response = request.json()['response']
-    with open('test.txt', 'w') as outfile:
-        json.dump(response, outfile)
+    required_info['Access Token'] = 'GI06VY9NNHhWwfwILfIJFCCXaPpLE5XizxSUcmdH'
+    required_info['Group Name'] = 'MVPs'
+    #group_ID = 26254692 #BIGData
+    group_ID = 7081565 #MVPs
+    _get_messages(required_info, group_ID)
+    #with open('bigData.json', 'w') as outfile:
+        #json.dump(messages, outfile)
 
 main()
